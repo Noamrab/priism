@@ -26,10 +26,10 @@ import priism_art.utils.MultiThreadedExecution;
 public class Test {
 private static final int PARTS = 3;
 private static final int MIN_CELL_COUNT_IN_DISC = 200;
-private static final int DISC_SIZE_PIXELS = 200;
+public static final int DISC_SIZE_PIXELS = 200;
 
 //	private static final String FILE_NAME = "/Users/noamrabinovich/Downloads/Noam Collaboration/Cell Map.csv";
-	private static final String FILE_NAME = "C:\\Temp\\Priism\\GM65-23-O1.csv";
+	private static final String FILE_NAME = "C:\\Temp\\Priism\\GM65-23-D3.csv";
 	
 	final int radius;
 	List<Cell> goodCells;
@@ -40,14 +40,20 @@ private static final int DISC_SIZE_PIXELS = 200;
 	PenetrationStatistics psHA;
 
 	private Grid grid;
+	private String fileName;
 	
-	public Test(int radius) {
+	public Test(String fileName, int radius) {
 		super();
+		this.fileName = fileName;
 		this.radius = radius;
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, CsvException {
-		Test t = new Test(DISC_SIZE_PIXELS);
+		perform(FILE_NAME, DISC_SIZE_PIXELS);
+	}
+
+	public static void perform(String fileName, int discSize) {
+		Test t = new Test(fileName, discSize);
 		t.init();
         
         t.calculate();
@@ -98,10 +104,10 @@ private static final int DISC_SIZE_PIXELS = 200;
 		}
 		cellNamesStr.addAll(0, DETAILED_REPORT_HEADER);
 		String[] headerArray = new String[cellNamesStr.size()];
-		writeDataLineByLine(FILE_NAME + "_output.csv", cellNamesStr.toArray(headerArray), data);
+		writeDataLineByLine(fileName + "_output.csv", cellNamesStr.toArray(headerArray), data);
 
-		writeDataLineByLine(FILE_NAME + "_c.csv", 	psC.getHeaders(), 	psC.toCSV());
-		writeDataLineByLine(FILE_NAME + "_ha.csv", 	psHA.getHeaders(),	psHA.toCSV());
+		writeDataLineByLine(fileName + "_c.csv", 	psC.getHeaders(), 	psC.toCSV());
+		writeDataLineByLine(fileName + "_ha.csv", 	psHA.getHeaders(),	psHA.toCSV());
 	}
 
 	
@@ -136,7 +142,7 @@ private static final int DISC_SIZE_PIXELS = 200;
 		dl.loadConfig(DataLoader.CONFIG);
 		pc = new PenetrationClassifier();
 		pc.loadConfig(PenetrationClassifier.CONFIG);
-		allCells = dl.readDataFile(FILE_NAME);
+		allCells = dl.readDataFile(fileName);
 		Map<CellClass, List<Cell>> map = allCells.stream().collect(Collectors.groupingBy(c -> c.getCellType().getCellClass()));
 		goodCells = map.get(CellClass.GOOD);
 		
