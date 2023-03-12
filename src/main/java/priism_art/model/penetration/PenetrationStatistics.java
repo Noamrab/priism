@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import priism_art.model.Cell;
@@ -13,6 +14,7 @@ import priism_art.model.CellTypeInfo;
 
 public class PenetrationStatistics {
 
+	public static final String OF_TOTAL = "% of total";
 	private Map<CellTypeInfo, Map<String, Integer>> statsMap;
 	private int totalCells;
 	private final CellTypeInfo targetCell;
@@ -35,33 +37,40 @@ public class PenetrationStatistics {
 		}
 	}
 	
-	public List<String[]> toCSV() {
-		List<String> classes = getClasses();
+	public static <U> List<String[]> toCSV(Map<CellTypeInfo, Map<String, U>> statsMap, BiFunction<List<String>, Entry<CellTypeInfo, Map<String, U>>, String[]> function) {
+		List<String> classes = PenetrationStatistics.getClasses(statsMap);
 		List<String[]> ret = new LinkedList<>();
-		for (Entry<CellTypeInfo, Map<String, Integer>> entry : getStatsMap().entrySet()) {
-			String[] arr = new String[classes.size() + 2];
-			ret.add(arr);
+		for (Entry<CellTypeInfo, Map<String, U>> entry : statsMap.entrySet()) {
+			String[] arr = function.apply(classes, entry);
 			arr[0] = entry.getKey().getName();
-			int total = entry.getValue().values().stream().mapToInt(a -> a).sum();
-			for (int i = 0; i < classes.size(); i++) {
-				Integer classCount = entry.getValue().get(classes.get(i));
-				classCount = classCount == null ? 0 : classCount;
-			arr[i + 1] = Double.toString((double) classCount / total);
-			}
-			arr[classes.size() + 1] = Double.toString((double) total / totalCells);
+			ret.add(arr);
 		}
 		ret.sort(Comparator.comparing(a -> a[0]));
 		return ret;
 	}
+	
+	public List<String[]> toCSV() {
+		return toCSV(getStatsMap(), (classes,entry) -> {
+			String[] arr = new String[classes.size() + 2];
+			int total = entry.getValue().values().stream().mapToInt(a -> a).sum();
+			for (int i = 0; i < classes.size(); i++) {
+				Integer classCount = entry.getValue().get(classes.get(i));
+				classCount = classCount == null ? 0 : classCount;
+				arr[i + 1] = Double.toString((double) classCount / total);
+			}
+			arr[classes.size() + 1] = Double.toString((double) total / totalCells);
+			return arr;
+		});
+	}
 
-	private List<String> getClasses() {
-		return getStatsMap().values().stream().map(a -> a.keySet()).flatMap(l -> l.stream()).distinct().sorted().collect(Collectors.toList());
+	public static <U> List<String> getClasses(Map<?, Map<String, U>> map) {
+		return map.values().stream().map(a -> a.keySet()).flatMap(l -> l.stream()).distinct().sorted().collect(Collectors.toList());
 	}
 	
 	public String[] getHeaders() {
-		var lst = getClasses();
+		var lst = getClasses(getStatsMap());
 		lst.add(0, "Name");
-		lst.add("% of total");
+		lst.add(OF_TOTAL);
 		return lst.toArray(new String[lst.size()]);
 	}
 
@@ -79,6 +88,11 @@ public class PenetrationStatistics {
 	
 	public String getTargetCellTypeName() {
 		return targetCell.getName();
+	}
+
+
+	public int getTotalCells() {
+		return totalCells;
 	}
 	
 	

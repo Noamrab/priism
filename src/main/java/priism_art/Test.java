@@ -1,8 +1,6 @@
 package priism_art;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -11,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 
 import priism_art.model.Cell;
@@ -20,6 +17,7 @@ import priism_art.model.CellTypeInfo;
 import priism_art.model.Grid;
 import priism_art.model.penetration.PenetrationClassifier;
 import priism_art.model.penetration.PenetrationStatistics;
+import priism_art.utils.CSVUtils;
 import priism_art.utils.MultiThreadedExecution;
 
 public class Test {
@@ -107,39 +105,15 @@ public static final int DISC_SIZE_PIXELS = 200;
 		}
 		cellNamesStr.addAll(0, reportHeader);
 		String[] headerArray = new String[cellNamesStr.size()];
-		writeDataLineByLine(fileName + "_output.csv", cellNamesStr.toArray(headerArray), data);
+		CSVUtils.writeDataLineByLine(fileName + "_output.csv", cellNamesStr.toArray(headerArray), data);
 		
 		for (PenetrationStatistics pStat : pStats) {
-			writeDataLineByLine(fileName + "_" + pStat.getTargetCellTypeName() + ".csv", pStat.getHeaders(), pStat.toCSV());
+			CSVUtils.writeDataLineByLine(fileName + "_" + pStat.getTargetCellTypeName() + ".csv", pStat.getHeaders(), pStat.toCSV());
 		}
 	}
 
 	
-	public static void writeDataLineByLine(String filePath, String[] header, List<String[]> data)
-	{
-	    // first create file object for file placed at location
-	    // specified by filepath
-	    File file = new File(filePath);
-	    try {
-	        // create FileWriter object with file as parameter
-	        FileWriter outputfile = new FileWriter(file);
-	  
-	        // create CSVWriter object filewriter object as parameter
-	        CSVWriter writer = new CSVWriter(outputfile);
-	  
-	        // adding header to csv
-	        writer.writeNext(header);
-	  
-	        writer.writeAll(data);
-	  
-	        // closing writer connection
-	        writer.close();
-	    }
-	    catch (IOException e) {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
-	    }
-	}
+	
 	
 	
 	
@@ -161,7 +135,7 @@ public static final int DISC_SIZE_PIXELS = 200;
 	}
 	
 	private void calculate() {
-		MultiThreadedExecution.create(goodCells).setThreadCount(16).setProgressInterval(1250).setAction(gCell -> {
+		MultiThreadedExecution.create(goodCells).setThreadCount(16).setProgressInterval(2250).setAction(gCell -> {
 			for (Cell aCell : allCells) {
 				if (aCell == gCell) {
 					continue;
