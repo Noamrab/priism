@@ -59,18 +59,17 @@ public class AggregatedStatistics {
 
 		for (PenetrationStatistics penetrationStatistics : stats) {
 			Map<CellTypeInfo, Map<String, Integer>> sMap = penetrationStatistics.getStatsMap();
-			int totalCells = penetrationStatistics.getTotalCells();
 			for (Entry<CellTypeInfo, Map<String, Integer>> entry : sMap.entrySet()) {
 				CellTypeInfo key = entry.getKey();
 				Map<String, Integer> value = entry.getValue();
 				Map<String, DescriptiveStatistics> innerResMap = retMap.computeIfAbsent(key, k -> new HashMap<String, DescriptiveStatistics>());
+				int total = entry.getValue().values().stream().mapToInt(a -> a).sum();
 				for (Entry<String, Integer> innerEntry : value.entrySet()) {
 					String innerKey = innerEntry.getKey();
 					DescriptiveStatistics values = innerResMap.computeIfAbsent(innerKey, k -> new DescriptiveStatistics());
 					double innerValue = (double)innerEntry.getValue();
-					values.addValue(innerValue / totalCells);
+					values.addValue(innerValue / total);
 				}
-				int total = entry.getValue().values().stream().mapToInt(a -> a).sum();
 				DescriptiveStatistics des = innerResMap.computeIfAbsent(PenetrationStatistics.OF_TOTAL, k -> new DescriptiveStatistics());
 				des.addValue((double) total / penetrationStatistics.getTotalCells());
 			}
