@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.opencsv.exceptions.CsvException;
@@ -125,8 +125,8 @@ public static final int DISC_SIZE_PIXELS = 200;
 		allCells = dl.readDataFile(fileName);
 		Map<CellClass, List<Cell>> map = allCells.stream().collect(Collectors.groupingBy(c -> c.getCellType().getCellClass()));
 		goodCells = map.get(CellClass.GOOD);
-		Set<CellTypeInfo> badCellsTypes = map.get(CellClass.BAD).stream().map(Cell::getCellType).collect(Collectors.toSet());
-		pStats = badCellsTypes.stream().map(c -> new PenetrationStatistics(allCells, c, pc)).collect(Collectors.toList());
+		Map<CellTypeInfo, Long> badCellsTypes = map.get(CellClass.BAD).stream().map(Cell::getCellType).collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+		pStats = badCellsTypes.entrySet().stream().map(c -> new PenetrationStatistics(allCells, c.getKey(), c.getValue(), pc)).collect(Collectors.toList());
 		
 		var maxX = allCells.stream().mapToDouble(Cell::getX).max().getAsDouble();
 		var maxY = allCells.stream().mapToDouble(Cell::getY).max().getAsDouble();
