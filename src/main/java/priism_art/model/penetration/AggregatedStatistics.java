@@ -12,6 +12,7 @@ import priism_art.model.CellTypeInfo;
 
 public class AggregatedStatistics {
 
+	private static final int CELL_NUM = 4;
 	List<PenetrationStatistics> stats;
 	Map<CellTypeInfo, Map<String, DescriptiveStatistics[]>> retMap;
 	
@@ -26,6 +27,7 @@ public class AggregatedStatistics {
 			lst.add(string);
 			lst.add(null);
 			lst.add(null);
+			lst.add(null);
 		}
 		lst.add(0, "Name");
 		return lst.toArray(new String[lst.size()]);
@@ -33,23 +35,25 @@ public class AggregatedStatistics {
 	
 	public List<String[]> toCSV() {
 		List<String[]> lst = PenetrationStatistics.toCSV(retMap, (classes, entry) -> {
-			int arrSize = classes.size() * 3;
+			int arrSize = classes.size() * CELL_NUM;
 			String[] arr = new String[arrSize  + 1];
-			for (int i = 0; i < arrSize; i+=3) {
-				DescriptiveStatistics[] dArr = entry.getValue().get(classes.get(i / 3));
+			for (int i = 0; i < arrSize; i+=CELL_NUM) {
+				DescriptiveStatistics[] dArr = entry.getValue().get(classes.get(i / CELL_NUM));
 				DescriptiveStatistics stats = dArr[0];
 				arr[i + 1] = Double.toString(stats.getMean());
 				arr[i + 2] = Double.toString(stats.getStandardDeviation());
 				arr[i + 3] = Double.toString(dArr[1].getMean());
+				arr[i + 4] = Double.toString(dArr[1].getStandardDeviation());
 			}
 			return arr;
 		});
 		if (!lst.isEmpty()) {
 			String[] header = new String[lst.get(0).length];
-			for (int i = 1; i < header.length; i+=3) {
-				header[i] = "Mean";
-				header[i + 1] = "Std Dev";
-				header[i + 2] = "Density";
+			for (int i = 1; i < header.length; i+=CELL_NUM) {
+				header[i] = "Pen Mean";
+				header[i + 1] = "Pen Std Dev";
+				header[i + 2] = "Density Mean";
+				header[i + 3] = "Density Std Dev";
 			}
 			lst.add(0,header);
 		}
