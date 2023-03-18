@@ -25,9 +25,10 @@ public class AggregatedStatistics {
 		List<String> lst = new LinkedList<>();
 		for (String string : PenetrationStatistics.getClasses(retMap)) {
 			lst.add(string);
-			lst.add(null);
-			lst.add(null);
-			lst.add(null);
+			// Create spacing
+			for (int i = 0; i < CELL_NUM - 1; i++) {
+				lst.add(null);
+			}
 		}
 		lst.add(0, "Name");
 		return lst.toArray(new String[lst.size()]);
