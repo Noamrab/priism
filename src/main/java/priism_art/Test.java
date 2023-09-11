@@ -18,7 +18,7 @@ import priism_art.model.Grid;
 import priism_art.model.penetration.PenetrationClassifier;
 import priism_art.model.penetration.PenetrationStatistics;
 import priism_art.utils.CSVUtils;
-import priism_art.utils.MultiThreadedExecution;
+import priism_art.utils.MultiExec;
 
 public class Test {
 private static final int PARTS = 3;
@@ -135,7 +135,7 @@ public static final int DISC_SIZE_PIXELS = 200;
 	}
 	
 	private void calculate() {
-		MultiThreadedExecution.create(goodCells).setThreadCount(16).setProgressInterval(2250).setAction(gCell -> {
+		MultiExec.create(goodCells).setThreadCount(16).setProgressInterval(2250).setAction(gCell -> {
 			for (Cell aCell : allCells) {
 				if (aCell == gCell) {
 					continue;

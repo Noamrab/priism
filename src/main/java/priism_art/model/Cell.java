@@ -78,6 +78,7 @@ public class Cell {
 	}
 
 	Map<CellTypeInfo, Integer> neighbourCount = new HashMap<>(); 
+	@SuppressWarnings("null")
 	public void addCellInRadious(Cell bCell) {
 		getNeighbourCount().merge(bCell.getCellType(), 1, Integer::sum);
 	}

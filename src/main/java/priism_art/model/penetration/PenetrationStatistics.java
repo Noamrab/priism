@@ -29,6 +29,7 @@ public class PenetrationStatistics {
 		this.pc = pc;
 	}
 
+	@SuppressWarnings("null")
 	public void add(Cell cell, int minCountInDisc) {
 		String classification = cell.getClassification(pc, getTargetCell(), minCountInDisc);
 		synchronized (getStatsMap()) {
